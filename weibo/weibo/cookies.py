@@ -5,13 +5,13 @@ import requests
 
 
 accounts = [
-    {'id': '#your email account', 'pwd': '#password'},
+    {'id': '#your email account', 'pwd': '#your password'},
 ]
 
 
 def get_cookies(weibo):
     """ 获取Cookies """
-    cookies = []
+    cookie_list = []
     login_url = r'https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.15)'
     for elem in weibo:
         account = elem['id']
@@ -42,10 +42,11 @@ def get_cookies(weibo):
         if info["retcode"] == "0":
             print "Get Cookie Success!( Account:%s )" % account
             cookie = session.cookies.get_dict()
-            cookies.append(cookie)
+            cookie_list.append(cookie)
         else:
             print "Failed!( Reason:%s )" % info['reason']
-    return cookies
+    return cookie_list
 
+cookies = get_cookies(accounts)
+print "Get Cookies Finish!( Num:%d)" % len(cookies)
 
-print "Get Cookies Finish!( Num:%d)" % len(get_cookies(accounts))
