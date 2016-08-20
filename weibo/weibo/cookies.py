@@ -9,15 +9,15 @@ accounts = [
 ]
 
 
-def getCookies(weibo):
+def get_cookies(weibo):
     """ 获取Cookies """
     cookies = []
-    loginURL = r'https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.15)'
+    login_url = r'https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.15)'
     for elem in weibo:
         account = elem['id']
         password = elem['pwd']
         username = base64.b64encode(account.encode('utf-8')).decode('utf-8')
-        postData = {
+        post_data = {
             "entry": "sso",
             "gateway": "1",
             "from": "null",
@@ -36,7 +36,7 @@ def getCookies(weibo):
             "returntype": "TEXT",
         }
         session = requests.Session()
-        r = session.post(loginURL, data=postData)
+        r = session.post(login_url, data=post_data)
         json_str = r.content.decode('gbk')
         info = json.loads(json_str)
         if info["retcode"] == "0":
@@ -48,5 +48,4 @@ def getCookies(weibo):
     return cookies
 
 
-cookies = getCookies(accounts)
-print "Get Cookies Finish!( Num:%d)" % len(cookies)
+print "Get Cookies Finish!( Num:%d)" % len(get_cookies(accounts))

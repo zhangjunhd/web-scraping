@@ -7,7 +7,7 @@ from scrapy.http import Request
 from weibo.items import InformationItem, WeibosItem, FollowsItem, FansItem
 
 
-class Spider(CrawlSpider):
+class Weibo(CrawlSpider):
     name = "weibo"
     host = "http://weibo.cn"
     start_urls = [
@@ -24,28 +24,28 @@ class Spider(CrawlSpider):
             self.finish_ID.add(ID)  # 加入已爬队列
             ID = str(ID)
             follows = []
-            followsItems = FollowsItem()
-            followsItems["_id"] = ID
-            followsItems["follows"] = follows
+            follows_item = FollowsItem()
+            follows_item["_id"] = ID
+            follows_item["follows"] = follows
             fans = []
-            fansItems = FansItem()
-            fansItems["_id"] = ID
-            fansItems["fans"] = fans
+            fans_item = FansItem()
+            fans_item["_id"] = ID
+            fans_item["fans"] = fans
 
             url_follows = "http://weibo.cn/%s/follow" % ID
             url_fans = "http://weibo.cn/%s/fans" % ID
             url_weibos = "http://weibo.cn/%s/profile?filter=1&page=1" % ID
             url_information = "http://weibo.cn/attgroup/opening?uid=%s" % ID
-            yield Request(url=url_follows, meta={"item": followsItems, "result": follows},
+            yield Request(url=url_follows, meta={"item": follows_item, "result": follows},
                           callback=self.parse_follow_or_fan)  # 去爬关注人
-            yield Request(url=url_fans, meta={"item": fansItems, "result": fans},
+            yield Request(url=url_fans, meta={"item": fans_item, "result": fans},
                           callback=self.parse_follow_or_fan)  # 去爬粉丝
             # yield Request(url=url_information, meta={"ID": ID}, callback=self.parse_person_info)  # 去爬个人信息
             # yield Request(url=url_weibos, meta={"ID": ID}, callback=self.parse2)  # 去爬微博
 
     def parse_person_info(self, response):
         """ 抓取个人信息1 """
-        informationItems = InformationItem()
+        info_item = InformationItem()
         selector = Selector(response)
         text0 = selector.xpath('body/div[@class="u"]/div[@class="tip2"]').extract_first()
         if text0:
@@ -53,19 +53,19 @@ class Spider(CrawlSpider):
             num_follows = re.findall(u'\u5173\u6ce8\[(\d+)\]', text0)  # 关注数
             num_fans = re.findall(u'\u7c89\u4e1d\[(\d+)\]', text0)  # 粉丝数
             if num_weibos:
-                informationItems["Num_Weibos"] = int(num_weibos[0])
+                info_item["Num_Weibos"] = int(num_weibos[0])
             if num_follows:
-                informationItems["Num_Follows"] = int(num_follows[0])
+                info_item["Num_Follows"] = int(num_follows[0])
             if num_fans:
-                informationItems["Num_Fans"] = int(num_fans[0])
-            informationItems["_id"] = response.meta["ID"]
+                info_item["Num_Fans"] = int(num_fans[0])
+                info_item["_id"] = response.meta["ID"]
             url_information1 = "http://weibo.cn/%s/info" % response.meta["ID"]
-            yield Request(url=url_information1, meta={"item": informationItems}, callback=self.parse_person_info_ext)
+            yield Request(url=url_information1, meta={"item": info_item}, callback=self.parse_person_info_ext)
 
     @staticmethod
     def parse_person_info_ext(response):
         """ 抓取个人信息2 """
-        informationItems = response.meta["item"]
+        info_item = response.meta["item"]
         selector = Selector(response)
         text1 = ";".join(selector.xpath('body/div[@class="c"]/text()').extract())  # 获取标签里的所有text()
         nickname = re.findall(u'\u6635\u79f0[:|\uff1a](.*?);', text1)  # 昵称
@@ -78,32 +78,32 @@ class Spider(CrawlSpider):
         url = re.findall(u'\u4e92\u8054\u7f51[:|\uff1a](.*?);', text1)  # 首页链接
 
         if nickname:
-            informationItems["NickName"] = nickname[0]
+            info_item["NickName"] = nickname[0]
         if gender:
-            informationItems["Gender"] = gender[0]
+            info_item["Gender"] = gender[0]
         if place:
             place = place[0].split(" ")
-            informationItems["Province"] = place[0]
+            info_item["Province"] = place[0]
             if len(place) > 1:
-                informationItems["City"] = place[1]
+                info_item["City"] = place[1]
         if signature:
-            informationItems["Signature"] = signature[0]
+            info_item["Signature"] = signature[0]
         if birthday:
             try:
                 birthday = datetime.datetime.strptime(birthday[0], "%Y-%m-%d")
-                informationItems["Birthday"] = birthday - datetime.timedelta(hours=8)
+                info_item["Birthday"] = birthday - datetime.timedelta(hours=8)
             except Exception, e:
                 print e
         if sexorientation:
             if sexorientation[0] == gender[0]:
-                informationItems["Sex_Orientation"] = "gay"
+                info_item["Sex_Orientation"] = "gay"
             else:
-                informationItems["Sex_Orientation"] = "Heterosexual"
+                info_item["Sex_Orientation"] = "Heterosexual"
         if marriage:
-            informationItems["Marriage"] = marriage[0]
+            info_item["Marriage"] = marriage[0]
         if url:
-            informationItems["URL"] = url[0]
-        yield informationItems
+            info_item["URL"] = url[0]
+        yield info_item
 
     def parse2(self, response):
         """ 抓取微博数据 """
