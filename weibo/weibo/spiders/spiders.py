@@ -5,34 +5,34 @@ from scrapy.spider import CrawlSpider
 from scrapy.selector import Selector
 from scrapy.http import Request
 from weibo.items import InformationItem, WeibosItem, FollowsItem, FansItem
-from weibo.project_cfg import project_config
+from scrawl_queue import ScrawlQueue
 
 
 class Weibo(CrawlSpider):
     name = "weibo"
     host = "http://weibo.cn"
-    start_urls = project_config.get_start_accounts()
-    scrawl_ID = set(start_urls)  # 记录待爬的微博ID
-    finish_ID = set()  # 记录已爬的微博ID
+
+    def __init__(self):
+        super(Weibo, self).__init__()
+        self.queue = ScrawlQueue()
 
     def start_requests(self):
         while True:
-            ID = self.scrawl_ID.pop()
-            self.finish_ID.add(ID)  # 加入已爬队列
-            ID = str(ID)
+            item = self.queue.pop_scrawl()
+            self.queue.push_finish(item)  # 加入已爬队列
             follows = []
             follows_item = FollowsItem()
-            follows_item["_id"] = ID
+            follows_item["_id"] = str(item)
             follows_item["follows"] = follows
             fans = []
             fans_item = FansItem()
-            fans_item["_id"] = ID
+            fans_item["_id"] = str(item)
             fans_item["fans"] = fans
 
-            url_follows = "http://weibo.cn/%s/follow" % ID
-            url_fans = "http://weibo.cn/%s/fans" % ID
-            url_weibos = "http://weibo.cn/%s/profile?filter=1&page=1" % ID
-            url_information = "http://weibo.cn/attgroup/opening?uid=%s" % ID
+            url_follows = "http://weibo.cn/%d/follow" % item
+            url_fans = "http://weibo.cn/%d/fans" % item
+            url_weibos = "http://weibo.cn/%d/profile?filter=1&page=1" % item
+            url_information = "http://weibo.cn/attgroup/opening?uid=%d" % item
             yield Request(url=url_follows, meta={"item": follows_item, "result": follows},
                           callback=self.parse_follow_or_fan)  # 去爬关注人
             yield Request(url=url_fans, meta={"item": fans_item, "result": fans},
@@ -139,7 +139,7 @@ class Weibo(CrawlSpider):
         url_next = selector.xpath(
             u'body/div[@class="pa" and @id="pagelist"]/form/div/a[text()="\u4e0b\u9875"]/@href').extract()
         if url_next:
-            yield Request(url=self.host + url_next[0], meta={"ID": response.meta["ID"]}, callback=self.parse2)
+            yield Request(url=Weibo.host + url_next[0], meta={"ID": response.meta["ID"]}, callback=self.parse2)
 
     def parse_follow_or_fan(self, response):
         """ 抓取关注或粉丝 """
@@ -151,13 +151,13 @@ class Weibo(CrawlSpider):
             elem = re.findall('uid=(\d+)', elem)
             if elem:
                 response.meta["result"].append(elem[0])
-                id = int(elem[0])
-                if id not in self.finish_ID:  # 新的ID，如果未爬则加入待爬队列
-                    self.scrawl_ID.add(id)
+                item = int(elem[0])
+                if not self.queue.exist_finish(item):  # 新的ID，如果未爬则加入待爬队列
+                    self.queue.pop_scrawl(item)
         url_next = selector.xpath(
             u'body//div[@class="pa" and @id="pagelist"]/form/div/a[text()="\u4e0b\u9875"]/@href').extract()
         if url_next:
-            yield Request(url=self.host + url_next[0], meta={"item": items, "result": response.meta["result"]},
+            yield Request(url=Weibo.host + url_next[0], meta={"item": items, "result": response.meta["result"]},
                           callback=self.parse_follow_or_fan)
         else:  # 如果没有下一页即获取完毕
             yield items

@@ -4,12 +4,18 @@ from project_cfg import project_config
 from items import InformationItem, WeibosItem, FollowsItem, FansItem
 
 
+COLLECTION_FOLLOW = 'Follows'
+COLLECTION_FAN = 'Fans'
+COLLECTION_INFORMATION = 'Information'
+COLLECTION_WEIBO = 'Weibo'
+
+
 class MongoDBTopology(object):
     def __init__(self):
         client = pymongo.MongoClient(project_config.get_database_url(), project_config.get_database_port())
-        db = client["Sina"]
-        self.Follows = db["Follows"]
-        self.Fans = db["Fans"]
+        db = client[project_config.get_database_name()]
+        self.Follows = db[COLLECTION_FOLLOW]
+        self.Fans = db[COLLECTION_FAN]
 
     def process_item(self, item, spider):
         """ 判断item的类型，并作相应的处理，再入数据库 """
@@ -37,11 +43,11 @@ class MongoDBTopology(object):
 class MongoDB(object):
     def __init__(self):
         client = pymongo.MongoClient(project_config.get_database_url(), project_config.get_database_port())
-        db = client["Sina"]
-        self.Information = db["Information"]
-        self.Weibo = db["Weibo"]
-        self.Follows = db["Follows"]
-        self.Fans = db["Fans"]
+        db = client[project_config.get_database_name()]
+        self.Information = db[COLLECTION_INFORMATION]
+        self.Weibo = db[COLLECTION_WEIBO]
+        self.Follows = db[COLLECTION_FOLLOW]
+        self.Fans = db[COLLECTION_FAN]
 
     def process_item(self, item, spider):
         """ 判断item的类型，并作相应的处理，再入数据库 """
