@@ -33,6 +33,15 @@ class ProjectConf(object):
     def get_start_accounts(self):
         return self.conf['start_account']
 
+    def scrawl_fan_and_follow(self):
+        return self.conf['scrawl']['fan_and_follow']
+
+    def scrawl_user_profile(self):
+        return self.conf['scrawl']['user_profile']
+
+    def scrawl_user_weibo(self):
+        return self.conf['scrawl']['user_weibo']
+
     def __str__(self):
         return str(self.conf)
 
@@ -50,3 +59,6 @@ if __name__ == "__main__":
     print prj_conf.get_database_port()
     print prj_conf.get_database_url()
     print prj_conf.get_start_accounts()
+    print prj_conf.scrawl_fan_and_follow()
+    print prj_conf.scrawl_user_profile()
+    print prj_conf.scrawl_user_weibo()

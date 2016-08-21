@@ -6,8 +6,8 @@ database:
 
 cookie:
   -
-    id: XXX@163.com
-    pwd: XXX
+    id: your email account
+    pwd: your password
 
 start_account:
   - 5235640836
@@ -37,3 +37,8 @@ start_account:
   - 5073111647
   - 5398825573
   - 2501511785
+
+scrawl:
+  fan_and_follow: true
+  user_profile: false
+  user_weibo: false
