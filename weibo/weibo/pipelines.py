@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import pymongo
+from project_cfg import project_config
 from items import InformationItem, WeibosItem, FollowsItem, FansItem
 
 
 class MongoDBTopology(object):
     def __init__(self):
-        client = pymongo.MongoClient("localhost", 27017)
+        client = pymongo.MongoClient(project_config.get_database_url(), project_config.get_database_port())
         db = client["Sina"]
         self.Follows = db["Follows"]
         self.Fans = db["Fans"]
@@ -35,7 +36,7 @@ class MongoDBTopology(object):
 
 class MongoDB(object):
     def __init__(self):
-        client = pymongo.MongoClient("localhost", 27017)
+        client = pymongo.MongoClient(project_config.get_database_url(), project_config.get_database_port())
         db = client["Sina"]
         self.Information = db["Information"]
         self.Weibo = db["Weibo"]
@@ -55,21 +56,21 @@ class MongoDB(object):
             except Exception, e:
                 print e
         elif isinstance(item, FollowsItem):
-            followsItems = dict(item)
-            follows = followsItems.pop("follows")
+            follows_item = dict(item)
+            follows = follows_item.pop("follows")
             for i in range(len(follows)):
-                followsItems[str(i + 1)] = follows[i]
+                follows_item[str(i + 1)] = follows[i]
             try:
-                self.Follows.insert(followsItems)
+                self.Follows.insert(follows_item)
             except Exception, e:
                 print e
         elif isinstance(item, FansItem):
-            fansItems = dict(item)
-            fans = fansItems.pop("fans")
+            fans_item = dict(item)
+            fans = fans_item.pop("fans")
             for i in range(len(fans)):
-                fansItems[str(i + 1)] = fans[i]
+                fans_item[str(i + 1)] = fans[i]
             try:
-                self.Fans.insert(fansItems)
+                self.Fans.insert(fans_item)
             except Exception, e:
                 print e
         return item

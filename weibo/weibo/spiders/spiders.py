@@ -5,16 +5,13 @@ from scrapy.spider import CrawlSpider
 from scrapy.selector import Selector
 from scrapy.http import Request
 from weibo.items import InformationItem, WeibosItem, FollowsItem, FansItem
+from weibo.project_cfg import project_config
 
 
 class Weibo(CrawlSpider):
     name = "weibo"
     host = "http://weibo.cn"
-    start_urls = [
-        5235640836, 5676304901, 5871897095, 2139359753, 5579672076, 2517436943, 5778999829, 5780802073, 2159807003,
-        1756807885, 3378940452, 5762793904, 1885080105, 5778836010, 5722737202, 3105589817, 5882481217, 5831264835,
-        2717354573, 3637185102, 1934363217, 5336500817, 1431308884, 5818747476, 5073111647, 5398825573, 2501511785,
-    ]
+    start_urls = project_config.get_start_accounts()
     scrawl_ID = set(start_urls)  # 记录待爬的微博ID
     finish_ID = set()  # 记录已爬的微博ID
 

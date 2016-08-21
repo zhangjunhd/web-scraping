@@ -2,11 +2,7 @@
 import json
 import base64
 import requests
-
-
-accounts = [
-    {'id': '#your email account', 'pwd': '#your password'},
-]
+from project_cfg import project_config
 
 
 def get_cookies(weibo):
@@ -47,6 +43,6 @@ def get_cookies(weibo):
             print "Failed!( Reason:%s )" % info['reason']
     return cookie_list
 
-cookies = get_cookies(accounts)
+cookies = get_cookies(project_config.get_cookies())
 print "Get Cookies Finish!( Num:%d)" % len(cookies)
 
