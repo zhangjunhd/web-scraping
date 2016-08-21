@@ -43,8 +43,11 @@ class ScrawlQueue(object):
         # load from database
         client = pymongo.MongoClient(project_config.get_database_url(), project_config.get_database_port())
         db = client[project_config.get_database_name()]
-        self._fill_from_collection(db, COLLECTION_FOLLOW)
-        self._fill_from_collection(db, COLLECTION_FAN)
+        if project_config.scrawl_fan_and_follow():
+            self._fill_from_collection(db, COLLECTION_FOLLOW)
+            self._fill_from_collection(db, COLLECTION_FAN)
+        else:
+            self._fill_from_collection2(db)
         self._fill_from_start_url()
         self.scrawl_ID -= self.finish_ID
         self.logger.info('finish fill finish_ID size:%d,scrawl_ID size:%d' % (len(self.finish_ID), len(self.scrawl_ID)))
@@ -53,6 +56,23 @@ class ScrawlQueue(object):
         cursor = database.get_collection(collection).find()
         for document in cursor:
             self.finish_ID.add(int(document['_id']))
+            for idx in range(1, len(document)):
+                self.scrawl_ID.add(int(document[str(idx)]))
+        self.logger.info('fill from database finish_ID size:%d,scrawl_ID size:%d' %
+                         (len(self.finish_ID), len(self.scrawl_ID)))
+
+    def _fill_from_collection2(self, database):
+        cursor = database.get_collection(COLLECTION_INFORMATION).find()
+        for document in cursor:
+            self.finish_ID.add(int(document['_id']))
+        cursor = database.get_collection(COLLECTION_FOLLOW).find()
+        for document in cursor:
+            self.scrawl_ID.add(int(document['_id']))
+            for idx in range(1, len(document)):
+                self.scrawl_ID.add(int(document[str(idx)]))
+        cursor = database.get_collection(COLLECTION_FAN).find()
+        for document in cursor:
+            self.scrawl_ID.add(int(document['_id']))
             for idx in range(1, len(document)):
                 self.scrawl_ID.add(int(document[str(idx)]))
         self.logger.info('fill from database finish_ID size:%d,scrawl_ID size:%d' %

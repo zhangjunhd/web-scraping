@@ -10,36 +10,6 @@ COLLECTION_INFORMATION = 'Information'
 COLLECTION_WEIBO = 'Weibo'
 
 
-class MongoDBTopology(object):
-    def __init__(self):
-        client = pymongo.MongoClient(project_config.get_database_url(), project_config.get_database_port())
-        db = client[project_config.get_database_name()]
-        self.Follows = db[COLLECTION_FOLLOW]
-        self.Fans = db[COLLECTION_FAN]
-
-    def process_item(self, item, spider):
-        """ 判断item的类型，并作相应的处理，再入数据库 """
-        if isinstance(item, FollowsItem):
-            followsItems = dict(item)
-            follows = followsItems.pop("follows")
-            for i in range(len(follows)):
-                followsItems[str(i + 1)] = follows[i]
-            try:
-                self.Follows.insert(followsItems)
-            except Exception, e:
-                print e
-        elif isinstance(item, FansItem):
-            fansItems = dict(item)
-            fans = fansItems.pop("fans")
-            for i in range(len(fans)):
-                fansItems[str(i + 1)] = fans[i]
-            try:
-                self.Fans.insert(fansItems)
-            except Exception, e:
-                print e
-        return item
-
-
 class MongoDB(object):
     def __init__(self):
         client = pymongo.MongoClient(project_config.get_database_url(), project_config.get_database_port())

@@ -10,7 +10,7 @@ DOWNLOADER_MIDDLEWARES = {
 }
 
 ITEM_PIPELINES = {
-    'weibo.pipelines.MongoDBTopology': 300,
+    'weibo.pipelines.MongoDB': 300,
 }
 
 DOWNLOAD_DELAY = 1  # 间隔时间
