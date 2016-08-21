@@ -23,6 +23,9 @@ class Weibo(CrawlSpider):
             self.logger.info('nothing need to scrawl and quit!')
             return
         self.queue.init()
+        if self.queue.scrawl_length() <= 30:
+            self.logger.info('queue is too small to scrawl and quit!')
+            return
         while True:
             uid = self.queue.pop_scrawl()
             self.queue.push_finish(uid)  # 加入已爬队列
