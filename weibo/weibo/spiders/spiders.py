@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import datetime
-from scrapy.spider import CrawlSpider
+from scrapy.spiders import CrawlSpider
 from scrapy.selector import Selector
 from scrapy.http import Request
 from weibo.items import InformationItem, WeibosItem, FollowsItem, FansItem
@@ -12,8 +12,8 @@ class Weibo(CrawlSpider):
     name = "weibo"
     host = "http://weibo.cn"
 
-    def __init__(self):
-        super(Weibo, self).__init__()
+    def __init__(self, *a, **kw):
+        super(Weibo, self).__init__(*a, **kw)
         self.queue = ScrawlQueue()
 
     def start_requests(self):
@@ -29,10 +29,11 @@ class Weibo(CrawlSpider):
             fans_item["_id"] = str(item)
             fans_item["fans"] = fans
 
-            url_follows = "http://weibo.cn/%d/follow" % item
-            url_fans = "http://weibo.cn/%d/fans" % item
-            url_weibos = "http://weibo.cn/%d/profile?filter=1&page=1" % item
-            url_information = "http://weibo.cn/attgroup/opening?uid=%d" % item
+            url_follows = "http://weibo.cn/%s/follow" % str(item)
+            url_fans = "http://weibo.cn/%s/fans" % str(item)
+            url_weibos = "http://weibo.cn/%s/profile?filter=1&page=1" % str(item)
+            url_information = "http://weibo.cn/attgroup/opening?uid=%s" % str(item)
+
             yield Request(url=url_follows, meta={"item": follows_item, "result": follows},
                           callback=self.parse_follow_or_fan)  # 去爬关注人
             yield Request(url=url_fans, meta={"item": fans_item, "result": fans},
@@ -153,7 +154,7 @@ class Weibo(CrawlSpider):
                 response.meta["result"].append(elem[0])
                 item = int(elem[0])
                 if not self.queue.exist_finish(item):  # 新的ID，如果未爬则加入待爬队列
-                    self.queue.pop_scrawl(item)
+                    self.queue.push_scrawl(item)
         url_next = selector.xpath(
             u'body//div[@class="pa" and @id="pagelist"]/form/div/a[text()="\u4e0b\u9875"]/@href').extract()
         if url_next:

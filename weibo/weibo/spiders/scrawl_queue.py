@@ -2,14 +2,12 @@
 import threading
 from weibo.project_cfg import project_config
 from weibo.pipelines import COLLECTION_FOLLOW, COLLECTION_FAN, COLLECTION_INFORMATION
-from weibo.logutil import Logging
 import pymongo
 
 
 class ScrawlQueue(object):
 
     def __init__(self):
-        self.logger = Logging.get_logger()
         self.scrawl_lock = threading.Lock()
         self.finish_lock = threading.Lock()
         self.scrawl_ID = set()  # 记录待爬的微博ID
@@ -44,22 +42,19 @@ class ScrawlQueue(object):
         self._fill_from_collection(COLLECTION_FAN)
         self._fill_from_start_url()
         self.scrawl_ID -= self.finish_ID
-        self.logger.info('finish fill finish_ID:%d,scrawl_ID:%d' % (len(self.finish_ID), len(self.scrawl_ID)))
 
     def _fill_from_collection(self, collection):
         cursor = self.db.get_collection(collection).find()
         for document in cursor:
-            self.finish_ID.add(document['_id'])
+            self.finish_ID.add(int(document['_id']))
             for idx in range(1, len(document)):
-                self.scrawl_ID.add(document[str(idx)])
-        self.logger.info('fill finish_ID:%d,scrawl_ID:%d' % (len(self.finish_ID), len(self.scrawl_ID)))
+                self.scrawl_ID.add(int(document[str(idx)]))
 
     def _fill_from_start_url(self):
         # check queue empty
         if len(self.scrawl_ID) == 0:
             start_urls = project_config.get_start_accounts()
             self.scrawl_ID = set(start_urls)
-            self.logger.info('finish fill scrawl_ID:%d' % len(self.scrawl_ID))
 
 
 if __name__ == "__main__":
