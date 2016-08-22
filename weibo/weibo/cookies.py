@@ -3,6 +3,12 @@ import json
 import base64
 import requests
 from project_cfg import project_config
+import logging
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+logger = logging.getLogger()
 
 
 def get_cookies(weibo):
@@ -10,7 +16,7 @@ def get_cookies(weibo):
     cookie_list = []
     login_url = r'https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.15)'
     for elem in weibo:
-        account = elem['id']
+        account = str(elem['id'])
         password = elem['pwd']
         username = base64.b64encode(account.encode('utf-8')).decode('utf-8')
         post_data = {
@@ -36,13 +42,13 @@ def get_cookies(weibo):
         json_str = r.content.decode('gbk')
         info = json.loads(json_str)
         if info["retcode"] == "0":
-            print "Get Cookie Success!( Account:%s )" % account
+            logger.info("Get Cookie Success!( Account:%s )" % account)
             cookie = session.cookies.get_dict()
             cookie_list.append(cookie)
         else:
-            print "Failed!( Reason:%s )" % info['reason']
+            logger.info("Failed!( Reason:%s )" % info['reason'])
     return cookie_list
 
 cookies = get_cookies(project_config.get_cookies())
-print "Get Cookies Finish!( Num:%d)" % len(cookies)
+logger.info("Get Cookies Finish!( Num:%d)" % len(cookies))
 
