@@ -27,7 +27,7 @@ class CookiesMiddleware(object):
             self.cookieQueue = ShiftQueue(cookies, project_config.get_cookie_rotate_time())
             self.shiftQueue.start()
         self.logger.info('init worker queue size:%d, rest queue size:%d'
-                         % (len(self.shiftQueue.get_work()), len(self.shiftQueue.get_rest())))
+                         % (len(self.cookieQueue.get_work()), len(self.cookieQueue.get_rest())))
 
     def process_request(self, request, spider):
         cookie = random.choice(self.cookieQueue.get_work())
