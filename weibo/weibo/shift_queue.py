@@ -7,7 +7,7 @@ from rw_lock import RWLock
 class ShiftQueue(threading.Thread):
     def __init__(self, item_list, shift_sec=1):
         super(ShiftQueue, self).__init__()
-        if len(item_list) == 1:
+        if len(item_list) <= 1:
             self.work = item_list
             self.rest = item_list
         else:
