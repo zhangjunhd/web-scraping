@@ -4,6 +4,18 @@ import copy
 from rw_lock import RWLock
 
 
+class NormalQueue(object):
+    def __init__(self, item_list):
+        self.work = item_list[:len(item_list) / 2]
+        self.rest = item_list[len(item_list) / 2:]
+
+    def get_work(self):
+        return self.work
+
+    def get_rest(self):
+        return self.rest
+
+
 class ShiftQueue(threading.Thread):
     def __init__(self, item_list, shift_sec=1):
         super(ShiftQueue, self).__init__()

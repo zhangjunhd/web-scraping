@@ -3,7 +3,7 @@ import random
 import logging
 from cookies import cookies
 from user_agents import agents
-from shift_queue import ShiftQueue
+from shift_queue import ShiftQueue, NormalQueue
 from project_cfg import project_config
 
 
@@ -20,10 +20,14 @@ class CookiesMiddleware(object):
 
     def __init__(self):
         self.logger = logging.getLogger()
-        self.shiftQueue = ShiftQueue(cookies, project_config.get_cookie_rotate_time())
+        rotate_time = project_config.get_cookie_rotate_time()
+        if rotate_time <= 1:
+            self.cookieQueue = NormalQueue(cookies)
+        else:
+            self.cookieQueue = ShiftQueue(cookies, project_config.get_cookie_rotate_time())
+            self.shiftQueue.start()
         self.logger.info('init worker queue size:%d, rest queue size:%d'
                          % (len(self.shiftQueue.get_work()), len(self.shiftQueue.get_rest())))
-        self.shiftQueue.start()
 
     def process_request(self, request, spider):
         cookie = random.choice(self.shiftQueue.get_work())
