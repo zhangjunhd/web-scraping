@@ -7,7 +7,7 @@ from rw_lock import RWLock
 class NormalQueue(object):
     def __init__(self, item_list):
         self.work = item_list
-        self.rest = self.work
+        self.rest = []
 
     def get_work(self):
         return self.work
