@@ -21,6 +21,9 @@ class ProjectConf(object):
     def get_cookies(self):
         return self.conf['cookie']
 
+    def get_cookie_rotate_time(self):
+        return self.conf['cookie_setting']['rotate_hour'] * 3600
+
     def get_database_url(self):
         return self.conf['database']['url']
 

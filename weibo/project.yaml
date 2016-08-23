@@ -6,8 +6,13 @@ database:
 
 cookie:
   -
-    id: your email account
-    pwd: your password
+    id: weibo account
+    pwd: weibo password
+
+cookie_setting:
+  use_file: false
+  file_path: /tmp/cookies.txt
+  rotate_hour: 6
 
 start_account:
   - 5235640836
