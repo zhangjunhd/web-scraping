@@ -30,5 +30,5 @@ class CookiesMiddleware(object):
                          % (len(self.shiftQueue.get_work()), len(self.shiftQueue.get_rest())))
 
     def process_request(self, request, spider):
-        cookie = random.choice(self.shiftQueue.get_work())
+        cookie = random.choice(self.cookieQueue.get_work())
         request.cookies = cookie
