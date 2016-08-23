@@ -25,7 +25,7 @@ class CookiesMiddleware(object):
             self.cookieQueue = NormalQueue(cookies)
         else:
             self.cookieQueue = ShiftQueue(cookies, project_config.get_cookie_rotate_time())
-            self.shiftQueue.start()
+            self.cookieQueue.start()
         self.logger.info('init worker queue size:%d, rest queue size:%d'
                          % (len(self.cookieQueue.get_work()), len(self.cookieQueue.get_rest())))
 
