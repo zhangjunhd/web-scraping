@@ -40,6 +40,7 @@ class ScrawlQueue(object):
             return len(self.scrawl_ID)
 
     def init(self):
+        self.logger.info('Init finish_ID and scrawl_ID ...')
         # load from database
         client = pymongo.MongoClient(project_config.get_database_url(), project_config.get_database_port())
         db = client[project_config.get_database_name()]
@@ -50,7 +51,7 @@ class ScrawlQueue(object):
             self._fill_from_collection2(db)
         self._fill_from_start_url()
         self.scrawl_ID -= self.finish_ID
-        self.logger.info('finish fill finish_ID size:%d,scrawl_ID size:%d' % (len(self.finish_ID), len(self.scrawl_ID)))
+        self.logger.info('Finish fill finish_ID size:%d,scrawl_ID size:%d' % (len(self.finish_ID), len(self.scrawl_ID)))
 
     def _fill_from_collection(self, database, collection):
         cursor = database.get_collection(collection).find()
@@ -58,7 +59,7 @@ class ScrawlQueue(object):
             self.finish_ID.add(int(document['_id']))
             for idx in range(1, len(document)):
                 self.scrawl_ID.add(int(document[str(idx)]))
-        self.logger.info('fill from database finish_ID size:%d,scrawl_ID size:%d' %
+        self.logger.info('Fill from database finish_ID size:%d,scrawl_ID size:%d' %
                          (len(self.finish_ID), len(self.scrawl_ID)))
 
     def _fill_from_collection2(self, database):
@@ -75,7 +76,7 @@ class ScrawlQueue(object):
             self.scrawl_ID.add(int(document['_id']))
             for idx in range(1, len(document)):
                 self.scrawl_ID.add(int(document[str(idx)]))
-        self.logger.info('fill from database finish_ID size:%d,scrawl_ID size:%d' %
+        self.logger.info('Fill from database finish_ID size:%d,scrawl_ID size:%d' %
                          (len(self.finish_ID), len(self.scrawl_ID)))
 
     def _fill_from_start_url(self):
@@ -83,7 +84,7 @@ class ScrawlQueue(object):
         if len(self.scrawl_ID) == 0:
             start_urls = project_config.get_start_accounts()
             self.scrawl_ID = set(start_urls)
-            self.logger.info('fill from start urls scrawl_ID size:%d' % len(self.scrawl_ID))
+            self.logger.info('Fill from start urls scrawl_ID size:%d' % len(self.scrawl_ID))
 
 
 if __name__ == "__main__":
