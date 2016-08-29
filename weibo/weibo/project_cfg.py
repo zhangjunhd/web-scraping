@@ -19,13 +19,26 @@ class ProjectConf(object):
             self.conf = yaml.load(f)
 
     def get_cookies(self):
-        return self.conf['cookie']
+        if not self.rotate_worker():
+            return self.conf['cookie']
+        total_worker = self.total_worker()
+        if total_worker <= 1:
+            return self.conf['cookie']
+        my_id = self.worker_id()
+        tmp = []
+        for i in range(len(self.conf['cookie'])):
+            if i % total_worker == my_id:
+                tmp.append(self.conf['cookie'][i])
+        return tmp
 
     def total_worker(self):
         return self.conf['worker']['total']
 
     def worker_id(self):
         return self.conf['worker']['id']
+
+    def rotate_worker(self):
+        return self.conf['cookie_setting']['rotate_worker']
 
     def get_cookie_rotate_time(self):
         return self.conf['cookie_setting']['rotate_hour'] * 3600

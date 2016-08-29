@@ -9,12 +9,13 @@ worker:
   total: 2
 
 cookie_setting:
+  rotate_worker: true
   rotate_hour: 0
 
 cookie:
   -
-    id: your email account
-    pwd: your password
+    id: your weibo account
+    pwd: your weibo password
 
 start_account:
   - 5235640836

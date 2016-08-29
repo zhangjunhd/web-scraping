@@ -11,11 +11,11 @@ sys.setdefaultencoding('utf8')
 logger = logging.getLogger()
 
 
-def get_cookies(weibo):
+def get_cookies(cookies):
     """ 获取Cookies """
     cookie_list = []
     login_url = r'https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.15)'
-    for elem in weibo:
+    for elem in cookies:
         account = str(elem['id'])
         password = str(elem['pwd'])
         username = base64.b64encode(account.encode('utf-8')).decode('utf-8')
