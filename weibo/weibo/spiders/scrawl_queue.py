@@ -51,6 +51,7 @@ class ScrawlQueue(object):
             self._fill_from_collection2(db)
         self._fill_from_start_url()
         self.scrawl_ID -= self.finish_ID
+        self._filter()
         self.logger.info('Finish fill finish_ID size:%d,scrawl_ID size:%d' % (len(self.finish_ID), len(self.scrawl_ID)))
 
     def _fill_from_collection(self, database, collection):
@@ -85,6 +86,18 @@ class ScrawlQueue(object):
             start_urls = project_config.get_start_accounts()
             self.scrawl_ID = set(start_urls)
             self.logger.info('Fill from start urls scrawl_ID size:%d' % len(self.scrawl_ID))
+
+    def _filter(self):
+        total_worker = project_config.total_worker()
+        if total_worker <= 1:
+            return
+        my_id = project_config.worker_id()
+        self.logger.info('Filter current id:%d,total:%d' % (my_id, total_worker))
+        tmp_ID = set()
+        for scrawl_id in self.scrawl_ID:
+            if scrawl_id % total_worker == my_id:
+                tmp_ID.add(scrawl_id)
+        self.scrawl_ID = tmp_ID
 
 
 if __name__ == "__main__":

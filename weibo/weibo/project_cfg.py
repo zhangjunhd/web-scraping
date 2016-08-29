@@ -21,6 +21,12 @@ class ProjectConf(object):
     def get_cookies(self):
         return self.conf['cookie']
 
+    def total_worker(self):
+        return self.conf['worker']['total']
+
+    def worker_id(self):
+        return self.conf['worker']['id']
+
     def get_cookie_rotate_time(self):
         return self.conf['cookie_setting']['rotate_hour'] * 3600
 

@@ -4,15 +4,17 @@ database:
   port: 27017
   db: Sina
 
-cookie:
-  -
-    id: weibo account
-    pwd: weibo password
+worker:
+  id: 1
+  total: 2
 
 cookie_setting:
-  use_file: false
-  file_path: /tmp/cookies.txt
-  rotate_hour: 6
+  rotate_hour: 0
+
+cookie:
+  -
+    id: your email account
+    pwd: your password
 
 start_account:
   - 5235640836
@@ -44,6 +46,6 @@ start_account:
   - 2501511785
 
 scrawl:
-  fan_and_follow: true
-  user_profile: false
+  fan_and_follow: false
+  user_profile: true
   user_weibo: false
