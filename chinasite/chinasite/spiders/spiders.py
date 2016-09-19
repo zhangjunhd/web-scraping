@@ -10,23 +10,20 @@ from chinasite.items import Site
 class ChinaSite(CrawlSpider):
     name = "chinasite"
     host = "http://top.chinaz.com"
-    total_page = 1730
-    scrawl_ID = set('http://top.chinaz.com/all/index.html')  # 记录待爬
-
-    cur_idx = 2
-    while cur_idx <= total_page:
-        scrawl_ID.add('http://top.chinaz.com/all/index_%d.html' % cur_idx)
-        cur_idx += 1
 
     def __init__(self, *a, **kw):
         super(ChinaSite, self).__init__(*a, **kw)
 
     def start_requests(self):
-        while True:
-            if len(self.scrawl_ID) == 0:
-                break
-            url = self.scrawl_ID.pop()
+        yield Request(url='http://top.chinaz.com/all/index.html', callback=self.parse_rank)
+        total_page = 1730
+        cur_idx = 2
+
+        while cur_idx <= total_page:
+            url = 'http://top.chinaz.com/all/index_%d.html' % cur_idx
+            self.logger.info('generate index url:%s' % url)
             yield Request(url=url, callback=self.parse_rank)
+            cur_idx += 1
 
     def parse_rank(self, response):
         selector = Selector(response)
@@ -44,7 +41,7 @@ class ChinaSite(CrawlSpider):
                 site['alexa'] = li.div.find_next_siblings("div")[0].div.a.string  # Alexa周排名
                 url_detail = urljoin('http://top.chinaz.com/', href)
                 site['url'] = url_detail
-                self.logger.info('generate url:%s' % url_detail)
+                self.logger.info('generate detail url:%s' % url_detail)
                 yield Request(url=url_detail, meta={"item": site}, callback=self.parse_detail)
 
     def parse_detail(self, response):
