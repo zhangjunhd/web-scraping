@@ -79,9 +79,9 @@ class ChinaSite(CrawlSpider):
             rank_loc = 0
             for li in ul.findAll('li'):
                 if li.a is not None:
-                    site[ranks[rank_loc]] = li.a.string
+                    site[ranks[rank_loc]] = int(li.a.string)
                 else:
-                    site[ranks[rank_loc]] = None
+                    site[ranks[rank_loc]] = 0
                 rank_loc += 1
 
         # 站点介绍
