@@ -23,6 +23,41 @@
 # 排序某个子分类
     db.Site.find({"subtype":"电商网站", "region_rank":{$ne:0}}).sort({"region_rank":1})
 
+# 一级域名去重后排序某个子分类
+    // mapper: fitler by url's last tow parts
+    map = function() {
+        var url_key = this._id;
+        var url_array = this._id.split(".");
+        if (url_array.length > 2) {
+            url_key = url_array[url_array.length - 2] + "." + url_array[url_array.length - 1]
+        }
+        emit(url_key, this);
+    }
+
+    // reducer: get the min alexa of url host
+    reduce = function(key, values) {
+        var retObj = values[0]
+        for (var obj in values) {
+            intval = parseInt(obj.alexa)
+            if ( intval <  parseInt(retObj.alexa)) {
+                retObj = obj;
+            }
+        }
+        return retObj;
+    }
+
+    // main query
+    db.Site.mapReduce(
+        map,
+        reduce, 
+        {out: "result", query:{"subtype":"电商网站", "alexa":{$ne:0}}})
+
+    // list result
+    db.result.find({})
+
+    // sort result
+    db.result.find({}).sort({"value.alexa":1})
+
 # rank缺失值填充
 ## 打印所有region_rank为null的记录
 
