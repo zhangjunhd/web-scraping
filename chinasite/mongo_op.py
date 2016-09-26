@@ -83,15 +83,11 @@ def sort_by_type(tpe, rank_by="total_rank", limit_size=100):
     return results
 
 
-def markdown(content_dict):
-    contents = ['#站长之家网站统计']
-    for kitem in content_dict.keys():
-        contents.append('- %s' % kitem)
-    for k, items in content_dict.items():
-        contents.extend(['##%s' % k,
-                         '| Title | Region | Rank | Alexa |',
-                         '| --- | --- | --- | --- |'])
-        for item in items:
+def markdown(content_dict, type):
+    contents = ['#站长之家网站统计:%s' % type]
+    contents.extend(['| Title | Region | Rank | Alexa |',
+                     '| --- | --- | --- | --- |'])
+    for item in content_dict:
         #    if item['description'] is None:
         #        desc = 'N/A'
         #    else:
@@ -108,7 +104,8 @@ def markdown(content_dict):
     file_object.close()
 
 if __name__ == '__main__':
-    print int_rank("政府组织")
+    results = sort_by_type("购物网站")
+    markdown(results, "购物网站")
 
 '''
 综合其他 8751
