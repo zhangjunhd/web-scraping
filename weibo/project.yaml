@@ -6,7 +6,7 @@ database:
 
 worker:
   id: 1
-  total: 2
+  total: 1
 
 cookie_setting:
   rotate_worker: true
@@ -47,6 +47,6 @@ start_account:
   - 2501511785
 
 scrawl:
-  fan_and_follow: false
+  fan_and_follow: true
   user_profile: true
   user_weibo: false
